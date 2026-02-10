@@ -1,10 +1,11 @@
 export type MarkerLocation = {
   id: number;
+  user_id: string;
   name: string;
   description: string;
   x: number;
   y: number;
   z: number;
-  created_at?: string;
-  updated_at?: string;
+  created_at: string;
+  updated_at: string;
 };

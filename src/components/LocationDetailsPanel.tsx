@@ -1,4 +1,11 @@
-export default function LocationDetailsPanel({ location, onClose }) {
+import type { MarkerLocation } from "../types/my_types";
+
+interface LocationDetailsProps {
+  location: MarkerLocation;
+  onClose: () => void;
+}
+
+export default function LocationDetailsPanel({ location, onClose }: LocationDetailsProps) {
   if (!location) {
     return (
       <div
