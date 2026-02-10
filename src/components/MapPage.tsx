@@ -85,6 +85,9 @@ export default function MapPage() {
         {/* Discord Login */}
         <button
           onClick={() => {
+            console.log("CLIENT ID:", import.meta.env.VITE_DISCORD_CLIENT_ID);
+            console.log("PROD REDIRECT:", import.meta.env.VITE_DISCORD_REDIRECT_URI_PROD);
+
             const redirect = encodeURIComponent(
               import.meta.env.VITE_DISCORD_REDIRECT_URI_PROD
             );
