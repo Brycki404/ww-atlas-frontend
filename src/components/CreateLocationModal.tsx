@@ -15,8 +15,8 @@ export default function CreateLocationModal({
   onSubmit,
   onClose,
 }: CreateLocationModalProps) {
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
+  const [name, setName] = useState<string>("");
+  const [description, setDescription] = useState<string | null>("");
   const [x, setX] = useState<number>(0);
   const [y, setY] = useState<number>(0);
   const [z, setZ] = useState<number>(0);
@@ -25,7 +25,7 @@ export default function CreateLocationModal({
   useEffect(() => {
     if (initialData) {
       setName(initialData.name);
-      setDescription(initialData.description);
+      setDescription(initialData.description ?? "");
       setX(initialData.x);
       setY(initialData.y);
       setZ(initialData.z);
@@ -36,7 +36,7 @@ export default function CreateLocationModal({
     const payload = {
       user_id: USER_ID,
       name,
-      description,
+      description: description?.trim() === "" ? null : description,
       x: Number(x),
       y: Number(y),
       z: Number(z),
@@ -95,7 +95,7 @@ export default function CreateLocationModal({
 
         <label>Description</label>
         <textarea
-          value={description}
+          value={description ?? ""}
           onChange={(e) => setDescription(e.target.value)}
           style={{ width: "100%", marginBottom: "10px" }}
         />
