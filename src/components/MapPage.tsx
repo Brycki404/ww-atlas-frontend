@@ -85,11 +85,11 @@ export default function MapPage() {
         <button
           onClick={() => {
             const redirect = encodeURIComponent(
-              import.meta.env.VITE_DISCORD_REDIRECT_URI
+              import.meta.env.DISCORD_REDIRECT_URI_PROD
             );
 
             const url =
-              `https://discord.com/oauth2/authorize?client_id=${import.meta.env.VITE_DISCORD_CLIENT_ID}` +
+              `https://discord.com/oauth2/authorize?client_id=${import.meta.env.DISCORD_CLIENT_ID}` +
               `&redirect_uri=${redirect}` +
               `&response_type=code&scope=identify`;
 
