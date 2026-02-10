@@ -26,6 +26,9 @@ jobs:
 
       - name: Build
         run: npm run build
+        env:
+          VITE_DISCORD_CLIENT_ID: ${{ secrets.VITE_DISCORD_CLIENT_ID }}
+          VITE_DISCORD_REDIRECT_URI_PROD: ${{ secrets.VITE_DISCORD_REDIRECT_URI_PROD }}
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
