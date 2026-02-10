@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import type { MarkerLocation, CommentRow, ScreenshotRow } from "../types/my_types";
+import type { LocationRow, CommentRow, ScreenshotRow } from "../types/my_types";
 import { USER_ID, API_URL } from "../main";
 
 interface LocationDetailsProps {
-  location: MarkerLocation | null;
+  location: LocationRow | null;
   onClose: () => void;
   onDelete: (id: number) => void;
-  onEdit: (loc: MarkerLocation) => void;
+  onEdit: (loc: LocationRow) => void;
 }
 
 export default function LocationDetailsPanel({
@@ -274,39 +274,70 @@ export default function LocationDetailsPanel({
       </button>
 
       {comments.map((c) => (
-        <div key={c.id} style={{ marginBottom: "10px" }}>
-          <p style={{ opacity: 0.8 }}>{c.body}</p>
-          <small style={{ opacity: 0.5 }}>
-            {new Date(c.created_at).toLocaleString()}
-          </small>
+        <div
+          key={c.id}
+          style={{
+            marginBottom: "14px",
+            display: "flex",
+            gap: "10px",
+            alignItems: "flex-start",
+          }}
+        >
+          {/* Avatar */}
+          <img
+            src={`https://cdn.discordapp.com/avatars/${c.discord_id}/${c.discord_avatar}.png`}
+            alt="avatar"
+            style={{
+              width: 32,
+              height: 32,
+              borderRadius: "50%",
+              flexShrink: 0,
+            }}
+          />
 
-          {c.user_id === USER_ID && (
-            <button
-              onClick={async () => {
-                await fetch(`${API_URL}/comments/${c.id}`, {
-                  method: "DELETE",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ user_id: USER_ID }),
-                });
+          {/* Comment content */}
+          <div style={{ flex: 1 }}>
+            <div style={{ fontWeight: 600, opacity: 0.9 }}>
+              {c.discord_username}
+            </div>
 
-                const res = await fetch(`${API_URL}/locations/${location.id}/comments`);
-                setComments(await res.json());
-              }}
-              style={{
-                marginTop: "5px",
-                padding: "4px 8px",
-                background: "#d9534f",
-                border: "none",
-                borderRadius: "4px",
-                color: "white",
-                cursor: "pointer",
-              }}
-            >
-              Delete
-            </button>
-          )}
+            <p style={{ margin: "4px 0", opacity: 0.85 }}>{c.body}</p>
 
-          <hr style={{ opacity: 0.1 }} />
+            <small style={{ opacity: 0.5 }}>
+              {new Date(c.created_at).toLocaleString()}
+            </small>
+
+            {/* Delete button if owner */}
+            {c.user_id === USER_ID && (
+              <button
+                onClick={async () => {
+                  await fetch(`${API_URL}/comments/${c.id}`, {
+                    method: "DELETE",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ user_id: USER_ID }),
+                  });
+
+                  const res = await fetch(
+                    `${API_URL}/locations/${location.id}/comments`
+                  );
+                  setComments(await res.json());
+                }}
+                style={{
+                  marginTop: "6px",
+                  padding: "4px 8px",
+                  background: "#d9534f",
+                  border: "none",
+                  borderRadius: "4px",
+                  color: "white",
+                  cursor: "pointer",
+                }}
+              >
+                Delete
+              </button>
+            )}
+
+            <hr style={{ opacity: 0.1, marginTop: "10px" }} />
+          </div>
         </div>
       ))}
     </div>

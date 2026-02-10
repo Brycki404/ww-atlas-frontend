@@ -13,6 +13,9 @@ export default function MapPage() {
   const [showMine, setShowMine] = useState(false);
   const [locations, setLocations] = useState<MarkerLocation[]>([]);
 
+  const username = localStorage.getItem("discord_username");
+  const avatar = localStorage.getItem("discord_avatar");
+
   // NEW STATE YOU WERE MISSING
   const [search, setSearch] = useState("");
   const [sortMode, setSortMode] = useState<"newest" | "oldest">("newest");
@@ -81,11 +84,16 @@ export default function MapPage() {
         {/* Discord Login */}
         <button
           onClick={() => {
-            const redirect = encodeURIComponent(window.location.origin + "/discord-callback");
-            window.location.href =
-              `https://discord.com/api/oauth2/authorize?client_id=${import.meta.env.VITE_DISCORD_CLIENT_ID}` +
+            const redirect = encodeURIComponent(
+              import.meta.env.VITE_DISCORD_REDIRECT_URI
+            );
+
+            const url =
+              `https://discord.com/oauth2/authorize?client_id=${import.meta.env.VITE_DISCORD_CLIENT_ID}` +
               `&redirect_uri=${redirect}` +
               `&response_type=code&scope=identify`;
+
+            window.location.href = url;
           }}
           style={{
             width: "100%",
@@ -100,6 +108,16 @@ export default function MapPage() {
         >
           Login with Discord
         </button>
+
+        {username && (
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <img
+              src={`https://cdn.discordapp.com/avatars/${userId}/${avatar}.png`}
+              style={{ width: 32, height: 32, borderRadius: "50%" }}
+            />
+            <span>Logged in as {username}</span>
+          </div>
+        )}
 
         {/* Create Location */}
         <button

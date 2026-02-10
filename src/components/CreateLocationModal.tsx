@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { USER_ID, API_URL } from "../main";
-import type { MarkerLocation } from "../types/my_types";
+import type { LocationRow } from "../types/my_types";
 
 interface CreateLocationModalProps {
-  initialData?: MarkerLocation | null;
+  initialData?: LocationRow | null;
   mode: "create" | "edit";
   onSubmit: () => void;
   onClose: () => void;

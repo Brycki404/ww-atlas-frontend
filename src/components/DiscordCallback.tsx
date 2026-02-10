@@ -8,21 +8,16 @@ export default function DiscordCallback() {
 
     if (!code) return;
 
-    const redirect_uri = window.location.origin + "/discord-callback";
-
     fetch(`${API_URL}/auth/discord`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        code,
-        redirect_uri,
-        client_id: import.meta.env.VITE_DISCORD_CLIENT_ID,
-        client_secret: import.meta.env.VITE_DISCORD_CLIENT_SECRET,
-      }),
+      body: JSON.stringify({ code }),
     })
       .then((res) => res.json())
       .then((data) => {
         localStorage.setItem("user_id", data.user_id);
+        localStorage.setItem("discord_username", data.discord_username);
+        localStorage.setItem("discord_avatar", data.discord_avatar);
         window.location.href = "/";
       });
   }, []);

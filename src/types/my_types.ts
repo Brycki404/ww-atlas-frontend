@@ -1,7 +1,7 @@
 // ------------------------------
 // LOCATION ROW
 // ------------------------------
-export type MarkerLocation = {
+export type LocationRow = {
   id: number;
   user_id: string;
   name: string;
@@ -11,6 +11,10 @@ export type MarkerLocation = {
   z: number;
   created_at: string;
   updated_at: string;
+
+  discord_username?: string | null;
+  discord_avatar?: string | null;
+  discord_id?: string | null;
 };
 
 // ------------------------------
@@ -22,6 +26,11 @@ export type CommentRow = {
   user_id: string;
   body: string;
   created_at: string;
+
+  // Added from JOIN
+  discord_username: string | null;
+  discord_avatar: string | null;
+  discord_id: string | null;
 };
 
 // ------------------------------
