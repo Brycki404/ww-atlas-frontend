@@ -1,7 +1,11 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta http-equiv="refresh" content="0; URL=/ww-atlas-frontend/" />
+    <script>
+      // Preserve full path + query string
+      const redirectUrl = "/ww-atlas-frontend" + window.location.pathname.replace("/ww-atlas-frontend", "") + window.location.search;
+      window.location.replace(redirectUrl);
+    </script>
   </head>
   <body></body>
 </html>
