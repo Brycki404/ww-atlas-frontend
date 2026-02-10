@@ -20,6 +20,7 @@ export default function LocationDetailsPanel({
 
   const [screenshots, setScreenshots] = useState<ScreenshotRow[]>([]);
   const [screenshotUrl, setScreenshotUrl] = useState("");
+  const [screenshotCaption, setScreenshotCaption] = useState("");
 
   // Fetch comments + screenshots when location changes
   useEffect(() => {
@@ -152,6 +153,13 @@ export default function LocationDetailsPanel({
         style={{ width: "100%", marginBottom: "10px" }}
       />
 
+      <input
+        value={screenshotCaption}
+        onChange={(e) => setScreenshotCaption(e.target.value)}
+        placeholder="Caption (optional)"
+        style={{ width: "100%", marginBottom: "10px" }}
+      />
+
       <button
         onClick={async () => {
           await fetch(`${API_URL}/locations/${location.id}/screenshots`, {
@@ -160,10 +168,12 @@ export default function LocationDetailsPanel({
             body: JSON.stringify({
               user_id: USER_ID,
               url: screenshotUrl,
+              caption: screenshotCaption,
             }),
           });
 
           setScreenshotUrl("");
+          setScreenshotCaption("");
 
           const res = await fetch(`${API_URL}/locations/${location.id}/screenshots`);
           setScreenshots(await res.json());
@@ -183,11 +193,42 @@ export default function LocationDetailsPanel({
 
       <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
         {screenshots.map((s) => (
-          <img
-            key={s.id}
-            src={s.url}
-            style={{ width: "100%", borderRadius: "6px" }}
-          />
+          <div key={s.id} style={{ position: "relative" }}>
+            <img
+              src={s.url}
+              style={{ width: "100%", borderRadius: "6px" }}
+            />
+
+            {s.caption && (
+              <p style={{ opacity: 0.8, marginTop: "4px" }}>{s.caption}</p>
+            )}
+
+            {s.user_id === USER_ID && (
+              <button
+                onClick={async () => {
+                  await fetch(`${API_URL}/screenshots/${s.id}`, {
+                    method: "DELETE",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ user_id: USER_ID }),
+                  });
+
+                  const res = await fetch(`${API_URL}/locations/${location.id}/screenshots`);
+                  setScreenshots(await res.json());
+                }}
+                style={{
+                  marginTop: "5px",
+                  padding: "4px 8px",
+                  background: "#d9534f",
+                  border: "none",
+                  borderRadius: "4px",
+                  color: "white",
+                  cursor: "pointer",
+                }}
+              >
+                Delete Screenshot
+              </button>
+            )}
+          </div>
         ))}
       </div>
 
@@ -238,6 +279,33 @@ export default function LocationDetailsPanel({
           <small style={{ opacity: 0.5 }}>
             {new Date(c.created_at).toLocaleString()}
           </small>
+
+          {c.user_id === USER_ID && (
+            <button
+              onClick={async () => {
+                await fetch(`${API_URL}/comments/${c.id}`, {
+                  method: "DELETE",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ user_id: USER_ID }),
+                });
+
+                const res = await fetch(`${API_URL}/locations/${location.id}/comments`);
+                setComments(await res.json());
+              }}
+              style={{
+                marginTop: "5px",
+                padding: "4px 8px",
+                background: "#d9534f",
+                border: "none",
+                borderRadius: "4px",
+                color: "white",
+                cursor: "pointer",
+              }}
+            >
+              Delete
+            </button>
+          )}
+
           <hr style={{ opacity: 0.1 }} />
         </div>
       ))}
