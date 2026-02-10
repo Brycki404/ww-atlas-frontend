@@ -92,6 +92,8 @@ export default function MapPage() {
               import.meta.env.VITE_DISCORD_REDIRECT_URI_PROD
             );
 
+            console.log("ACTUAL REDIRECT SENT TO DISCORD:", redirect);
+
             const url =
               `https://discord.com/oauth2/authorize?client_id=${import.meta.env.VITE_DISCORD_CLIENT_ID}` +
               `&redirect_uri=${redirect}` +
