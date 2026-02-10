@@ -1,16 +1,36 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { USER_ID, API_URL } from "../main";
+import type { MarkerLocation } from "../types/my_types";
 
-interface Props {
+interface CreateLocationModalProps {
+  initialData?: MarkerLocation | null;
+  mode: "create" | "edit";
+  onSubmit: () => void;
   onClose: () => void;
 }
 
-export default function CreateLocationModal({ onClose }: Props) {
+export default function CreateLocationModal({
+  initialData,
+  mode,
+  onSubmit,
+  onClose,
+}: CreateLocationModalProps) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [x, setX] = useState<number>(0);
   const [y, setY] = useState<number>(0);
   const [z, setZ] = useState<number>(0);
+
+  // Pre-fill fields when editing
+  useEffect(() => {
+    if (initialData) {
+      setName(initialData.name);
+      setDescription(initialData.description);
+      setX(initialData.x);
+      setY(initialData.y);
+      setZ(initialData.z);
+    }
+  }, [initialData]);
 
   const handleSubmit = async () => {
     const payload = {
@@ -23,18 +43,23 @@ export default function CreateLocationModal({ onClose }: Props) {
     };
 
     try {
-      const res = await fetch(`${API_URL}/locations`, {
-        method: "POST",
+      const url =
+        mode === "create"
+          ? `${API_URL}/locations`
+          : `${API_URL}/locations/${initialData?.id}`;
+
+      const res = await fetch(url, {
+        method: mode === "create" ? "POST" : "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
       const data = await res.json();
-      console.log("Created:", data);
+      console.log("Saved:", data);
 
-      onClose();
+      onSubmit(); // refresh locations + close modal
     } catch (err) {
-      console.error("Error creating location:", err);
+      console.error("Error saving location:", err);
     }
   };
 
@@ -59,7 +84,7 @@ export default function CreateLocationModal({ onClose }: Props) {
           color: "white",
         }}
       >
-        <h2>Create Location</h2>
+        <h2>{mode === "create" ? "Create Location" : "Edit Location"}</h2>
 
         <label>Name</label>
         <input
@@ -123,7 +148,7 @@ export default function CreateLocationModal({ onClose }: Props) {
               color: "white",
             }}
           >
-            Create
+            {mode === "create" ? "Create" : "Save Changes"}
           </button>
         </div>
       </div>

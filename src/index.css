@@ -4,6 +4,15 @@ html, body, #root {
   padding: 0;
 }
 
+.created-by-you {
+  background: #4caf50;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;

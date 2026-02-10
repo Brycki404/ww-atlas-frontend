@@ -1,24 +1,26 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
 import { OutlinePass } from "three/examples/jsm/postprocessing/OutlinePass.js";
 import type { MarkerLocation } from "../types/my_types";
-import { API_URL } from "../main";
+import { USER_ID } from "../main";
 
 type Map3DProps = {
+  locations: MarkerLocation[];
   onSelectLocation: (loc: MarkerLocation | null) => void;
   selectedLocation: MarkerLocation | null;
+  showMine: boolean;
 };
 
 export default function Map3D({
+  locations,
   onSelectLocation,
-  selectedLocation
+  selectedLocation,
+  showMine,
 }: Map3DProps) {
   const mountRef = useRef<HTMLDivElement | null>(null);
-
-  const [locations, setLocations] = useState<MarkerLocation[]>([]);
 
   const sceneRef = useRef<THREE.Scene | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
@@ -33,14 +35,6 @@ export default function Map3D({
 
   const raycaster = useRef(new THREE.Raycaster());
   const mouse = useRef(new THREE.Vector2());
-
-  // Fetch locations
-  useEffect(() => {
-    fetch(`${API_URL}/locations`)
-      .then(res => res.json())
-      .then(data => setLocations(data))
-      .catch(err => console.error("Failed to fetch locations", err));
-  }, []);
 
   // Smooth camera fly-to animation
   const flyTo = (targetPos: THREE.Vector3) => {
@@ -76,16 +70,14 @@ export default function Map3D({
     const outlinePass = outlinePassRef.current;
     if (!outlinePass) return;
 
-    // Clear previous highlight
     outlinePass.selectedObjects = [];
     selectedMarkerRef.current = null;
 
-    // Apply new highlight
     outlinePass.selectedObjects = [mesh];
     selectedMarkerRef.current = mesh;
   };
 
-  // Clear highlight (when panel closes)
+  // Clear highlight
   const clearHighlight = () => {
     const outlinePass = outlinePassRef.current;
     if (!outlinePass) return;
@@ -127,14 +119,9 @@ export default function Map3D({
     const grid = new THREE.GridHelper(200, 200, 0xcccccc, 0x888888);
     scene.add(grid);
 
-    // const light = new THREE.DirectionalLight(0xffffff, 0);
-    // light.position.set(10, 20, 10);
-    // scene.add(light);
-
     const ambient = new THREE.AmbientLight(0xffffff, 1.2);
     scene.add(ambient);
 
-    // Postprocessing setup
     const composer = new EffectComposer(renderer);
     composer.addPass(new RenderPass(scene, camera));
     composerRef.current = composer;
@@ -147,12 +134,11 @@ export default function Map3D({
     outlinePass.edgeStrength = 4;
     outlinePass.edgeGlow = 0.5;
     outlinePass.edgeThickness = 1.5;
-    outlinePass.visibleEdgeColor.set("#ffffff"); // white glow
+    outlinePass.visibleEdgeColor.set("#ffffff");
     outlinePass.hiddenEdgeColor.set("#ffffff");
     composer.addPass(outlinePass);
     outlinePassRef.current = outlinePass;
 
-    // Click handler
     const handleClick = (event: MouseEvent) => {
       if (
         !rendererRef.current ||
@@ -211,9 +197,9 @@ export default function Map3D({
       window.removeEventListener("resize", handleResize);
       mount.removeChild(renderer.domElement);
     };
-  }, []);
+  }, [onSelectLocation]);
 
-  // Render markers when locations change
+  // Render markers when locations or showMine change
   useEffect(() => {
     const scene = sceneRef.current;
     if (!scene) return;
@@ -226,16 +212,25 @@ export default function Map3D({
     markerGroupRef.current = markerGroup;
     scene.add(markerGroup);
 
-    locations.forEach(loc => {
+    const visibleLocations = showMine
+      ? locations.filter((loc) => loc.user_id === USER_ID)
+      : locations;
+
+    visibleLocations.forEach((loc) => {
+      const isMine = loc.user_id === USER_ID;
+
       const marker = new THREE.Mesh(
         new THREE.SphereGeometry(0.5, 16, 16),
-        new THREE.MeshStandardMaterial({ color: 0xff00ff })
+        new THREE.MeshStandardMaterial({
+          color: isMine ? 0x00ff00 : 0xff00ff, // green for yours, magenta for others
+        })
       );
+      
       marker.position.set(loc.x, loc.y, loc.z);
       marker.userData = loc;
       markerGroup.add(marker);
     });
-  }, [locations]);
+  }, [locations, showMine]);
 
   return (
     <div
