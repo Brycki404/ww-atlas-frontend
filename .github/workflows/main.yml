@@ -25,10 +25,10 @@ jobs:
         run: npm ci
 
       - name: Build
-        run: npm run build
-        env:
-          VITE_DISCORD_CLIENT_ID: ${{ secrets.VITE_DISCORD_CLIENT_ID }}
-          VITE_DISCORD_REDIRECT_URI_PROD: ${{ secrets.VITE_DISCORD_REDIRECT_URI_PROD }}
+        run: |
+          export VITE_DISCORD_CLIENT_ID=${{ secrets.VITE_DISCORD_CLIENT_ID }}
+          export VITE_DISCORD_REDIRECT_URI_PROD=${{ secrets.VITE_DISCORD_REDIRECT_URI_PROD }}
+          npm run build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
