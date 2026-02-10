@@ -15,10 +15,11 @@ interface Map3DProps {
   locations: LocationRow[];
   showMine: boolean;
   USER_ID: string | null;
-  onSelectLocation: (loc: LocationRow) => void;
+  onSelectLocation: (loc: LocationRow | null) => void;
+  selectedLocation: LocationRow | null;   // ⭐ ADD THIS
 }
 
-export function Map3D({ locations, showMine, USER_ID, onSelectLocation }: Map3DProps) {
+export default function Map3D({ locations, showMine, USER_ID, onSelectLocation }: Map3DProps) {
   const mountRef = useRef<HTMLDivElement | null>(null);
 
   const sceneRef = useRef<THREE.Scene | null>(null);

@@ -2,16 +2,16 @@ import { useEffect, useState } from "react";
 import Map3D from "./Map3D";
 import CreateLocationModal from "./CreateLocationModal";
 import LocationDetailsPanel from "./LocationDetailsPanel";
-import type { MarkerLocation } from "../types/my_types";
+import type { LocationRow } from "../types/my_types";
 import { USER_ID, API_URL } from "../main";
 
 export default function MapPage() {
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [editingLocation, setEditingLocation] = useState<MarkerLocation | null>(null);
+  const [editingLocation, setEditingLocation] = useState<LocationRow | null>(null);
 
-  const [selectedLocation, setSelectedLocation] = useState<MarkerLocation | null>(null);
+  const [selectedLocation, setSelectedLocation] = useState<LocationRow | null>(null);
   const [showMine, setShowMine] = useState(false);
-  const [locations, setLocations] = useState<MarkerLocation[]>([]);
+  const [locations, setLocations] = useState<LocationRow[]>([]);
 
   const username = localStorage.getItem("discord_username");
   const avatar = localStorage.getItem("discord_avatar");
@@ -40,7 +40,7 @@ export default function MapPage() {
   }
 
   // Open modal in edit mode
-  function handleEdit(location: MarkerLocation) {
+  function handleEdit(location: LocationRow) {
     setEditingLocation(location);
     setShowCreateModal(true);
   }
@@ -112,7 +112,7 @@ export default function MapPage() {
         {username && (
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             <img
-              src={`https://cdn.discordapp.com/avatars/${userId}/${avatar}.png`}
+              src={`https://cdn.discordapp.com/avatars/${USER_ID}/${avatar}.png`}
               style={{ width: 32, height: 32, borderRadius: "50%" }}
             />
             <span>Logged in as {username}</span>
@@ -184,6 +184,7 @@ export default function MapPage() {
       {/* 3D Map */}
       <div style={{ flex: 1, position: "relative" }}>
         <Map3D
+          USER_ID={USER_ID}
           locations={sorted}
           onSelectLocation={setSelectedLocation}
           selectedLocation={selectedLocation}
