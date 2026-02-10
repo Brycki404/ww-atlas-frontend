@@ -23,7 +23,7 @@ export default function DiscordCallback() {
         localStorage.setItem("discord_avatar", data.discord_avatar);
 
         // This respects the basename="/ww-atlas-frontend"
-        navigate("/");
+        window.location.href = "/ww-atlas-frontend/";
       });
   }, [navigate]);
 
