@@ -1,7 +1,7 @@
 import type { MarkerLocation } from "../types/my_types";
 
 interface LocationDetailsProps {
-  location: MarkerLocation;
+  location: MarkerLocation | null;
   onClose: () => void;
 }
 
