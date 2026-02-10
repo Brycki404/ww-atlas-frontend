@@ -26,8 +26,8 @@ jobs:
 
       - name: Build
         run: |
-          export VITE_DISCORD_CLIENT_ID=${{ secrets.VITE_DISCORD_CLIENT_ID }}
-          export VITE_DISCORD_REDIRECT_URI_PROD=${{ secrets.VITE_DISCORD_REDIRECT_URI_PROD }}
+          export VITE_DISCORD_CLIENT_ID="${{ secrets.VITE_DISCORD_CLIENT_ID }}"
+          export VITE_DISCORD_REDIRECT_URI_PROD="${{ secrets.VITE_DISCORD_REDIRECT_URI_PROD }}"
           npm run build
 
       - name: Upload artifact
