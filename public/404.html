@@ -2,19 +2,23 @@
 <html>
   <head>
     <script>
-      // Remove ONLY the first occurrence of the base path
       const base = "/ww-atlas-frontend";
-      let path = window.location.pathname;
 
+      let path = window.location.pathname;
+      const query = window.location.search;
+
+      // If the path already starts with the base, strip it ONCE
       if (path.startsWith(base)) {
         path = path.slice(base.length);
       }
 
-      // Preserve query string
-      const query = window.location.search;
+      // Build the correct redirect target
+      const target = base + path + query;
 
-      // Redirect to the SPA root with the correct internal route
-      window.location.replace(base + path + query);
+      // Only redirect if we're NOT already at the correct target
+      if (window.location.pathname + window.location.search !== target) {
+        window.location.replace(target);
+      }
     </script>
   </head>
   <body></body>
