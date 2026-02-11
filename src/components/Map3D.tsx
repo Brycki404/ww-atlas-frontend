@@ -144,8 +144,8 @@ const Map3D = forwardRef(function Map3D({ locations, showMine, USER_ID, onSelect
         }
 
         // Create / move 3D profile card near marker
-        if (profileCardRef.current) {
-          scene.remove(profileCardRef.current);
+        if (profileCardRef.current && sceneRef.current) {
+          sceneRef.current.remove(profileCardRef.current);
           profileCardRef.current = null;
         }
 
@@ -361,6 +361,13 @@ const Map3D = forwardRef(function Map3D({ locations, showMine, USER_ID, onSelect
       }
     });
   }, [locations, showMine, USER_ID]);
+
+  useEffect(() => {
+    if (!selectedLocation && profileCardRef.current && sceneRef.current) {
+      sceneRef.current.remove(profileCardRef.current);
+      profileCardRef.current = null;
+    }
+  }, [selectedLocation]);
 
   return (
     <div
