@@ -5,7 +5,6 @@ import CreateLocationModal from "./CreateLocationModal";
 import LocationDetailsPanel from "./LocationDetailsPanel";
 import type { LocationRow } from "../types/my_types";
 import { USER_ID, API_URL } from "../main";
-import DiscordCallback from "./DiscordCallback";
 
 export default function MapPage() {
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -53,9 +52,31 @@ export default function MapPage() {
 
     if (!code) return;
 
-    DiscordCallback();
-    // Your existing DiscordCallback logic goes here
-    // fetch token, store user, navigate, etc.
+    // 1. Exchange code for user info
+    fetch(`${API_URL}/auth/discord`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code }),
+    })
+      .then(async (res) => {
+        const text = await res.text();
+        console.log("RAW RESPONSE:", text);
+        return JSON.parse(text);
+      })
+      .then((data) => {
+        console.log("PARSED DATA:", data);
+
+        // 2. Store user info
+        localStorage.setItem("user_id", data.user_id);
+        localStorage.setItem("discord_username", data.discord_username);
+        localStorage.setItem("discord_avatar", data.discord_avatar);
+
+        // 3. Remove ?code=XYZ from the URL
+        window.history.replaceState({}, "", "/ww-atlas-frontend/");
+      })
+      .catch((err) => {
+        console.error("CALLBACK ERROR:", err);
+      });
   }, []);
 
   useEffect(() => {
