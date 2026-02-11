@@ -25,6 +25,11 @@ export default function MapPage() {
     setLocations(data);
   }
 
+  const [user_id, setUserId] = useState(localStorage.getItem("user_id"));
+  const [username, setUsername] = useState(localStorage.getItem("discord_username"));
+  const [avatar, setAvatar] = useState(localStorage.getItem("discord_avatar"));
+  const [discord_id, setDiscordId] = useState(localStorage.getItem("discord_id"));
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const code = params.get("code");
@@ -51,6 +56,11 @@ export default function MapPage() {
         localStorage.setItem("discord_username", data.discord_username);
         localStorage.setItem("discord_avatar", data.discord_avatar);
 
+        setUserId(data.user_id);
+        setDiscordId(data.discord_id);
+        setUsername(data.discord_username);
+        setAvatar(data.discord_avatar);
+
         // 3. Remove ?code=XYZ from the URL
         window.history.replaceState({}, "", "/ww-atlas-frontend/");
       })
@@ -58,11 +68,6 @@ export default function MapPage() {
         console.error("CALLBACK ERROR:", err);
       });
   }, []);
-
-  const user_id = localStorage.getItem("user_id");
-  const discord_id = localStorage.getItem("discord_id");
-  const username = localStorage.getItem("discord_username");
-  const avatar = localStorage.getItem("discord_avatar");
 
     // Delete a location
   async function handleDelete(id: number) {
@@ -119,37 +124,31 @@ export default function MapPage() {
         <h2>WW Atlas</h2>
 
         {/* Discord Login */}
-        <button
-          onClick={() => {
-            console.log("CLIENT ID:", import.meta.env.VITE_DISCORD_CLIENT_ID);
-            console.log("PROD REDIRECT:", import.meta.env.VITE_DISCORD_REDIRECT_URI_PROD);
+        {!username && (
+          <button
+            onClick={() => {
+              const redirect = encodeURIComponent(import.meta.env.VITE_DISCORD_REDIRECT_URI_PROD);
+              const url =
+                `https://discord.com/oauth2/authorize?client_id=${import.meta.env.VITE_DISCORD_CLIENT_ID}` +
+                `&redirect_uri=${redirect}` +
+                `&response_type=code&scope=identify`;
 
-            const redirect = encodeURIComponent(
-              import.meta.env.VITE_DISCORD_REDIRECT_URI_PROD
-            );
-
-            console.log("ACTUAL REDIRECT SENT TO DISCORD:", redirect);
-
-            const url =
-              `https://discord.com/oauth2/authorize?client_id=${import.meta.env.VITE_DISCORD_CLIENT_ID}` +
-              `&redirect_uri=${redirect}` +
-              `&response_type=code&scope=identify`;
-
-            window.location.href = url;
-          }}
-          style={{
-            width: "100%",
-            padding: "10px",
-            marginTop: "20px",
-            background: "#5865F2",
-            color: "white",
-            border: "none",
-            borderRadius: "6px",
-            cursor: "pointer",
-          }}
-        >
-          Login with Discord
-        </button>
+              window.location.href = url;
+            }}
+            style={{
+              width: "100%",
+              padding: "10px",
+              marginTop: "20px",
+              background: "#5865F2",
+              color: "white",
+              border: "none",
+              borderRadius: "6px",
+              cursor: "pointer",
+            }}
+          >
+            Login with Discord
+          </button>
+        )}
 
         {username && discord_id && avatar && (
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
