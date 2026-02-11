@@ -336,7 +336,8 @@ const Map3D = forwardRef(function Map3D({ locations, showMine, USER_ID, onSelect
     if (!selectedLocation && profileCardRef.current && sceneRef.current) {
       sceneRef.current.remove(profileCardRef.current);
       profileCardRef.current = null;
-    }
+    } 
+    onSelectLocation(selectedLocation);
   }, [selectedLocation]);
 
   return (
