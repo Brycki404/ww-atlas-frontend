@@ -151,7 +151,7 @@ export default function MapPage() {
           Login with Discord
         </button>
 
-        {username && (
+        {username && discord_id && avatar && (
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             <img
               src={`https://cdn.discordapp.com/avatars/${discord_id}/${avatar}.png`}
