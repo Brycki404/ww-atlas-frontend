@@ -272,17 +272,26 @@ const Map3D = forwardRef(function Map3D({ locations, showMine, USER_ID, onSelect
     const scene = sceneRef.current;
     if (!scene) return;
 
+    // ⭐ 1. Clear old tooltip DOM nodes BEFORE rebuilding
+    if (labelRendererRef.current) {
+      const dom = labelRendererRef.current.domElement;
+      while (dom.firstChild) dom.removeChild(dom.firstChild);
+    }
+
+    // ⭐ 2. Remove old marker group
     const oldGroup = scene.getObjectByName("markers");
     if (oldGroup) scene.remove(oldGroup);
 
+    // ⭐ 3. Create new marker group
     const markerGroup = new THREE.Group();
     markerGroup.name = "markers";
     markerGroupRef.current = markerGroup;
     scene.add(markerGroup);
 
-    const visibleLocations = showMine && USER_ID
-      ? locations.filter((loc) => loc.user_id === USER_ID)
-      : locations;
+    const visibleLocations =
+      showMine && USER_ID
+        ? locations.filter((loc) => loc.user_id === USER_ID)
+        : locations;
 
     const textureLoader = new THREE.TextureLoader();
 
@@ -303,7 +312,7 @@ const Map3D = forwardRef(function Map3D({ locations, showMine, USER_ID, onSelect
       marker.userData = loc;
       markerGroup.add(marker);
 
-      // ⭐ Tooltip: ALWAYS create this
+      // ⭐ 4. Tooltip ALWAYS created
       if (labelRendererRef.current) {
         const tooltip = document.createElement("div");
         tooltip.style.padding = "4px 8px";
@@ -313,36 +322,33 @@ const Map3D = forwardRef(function Map3D({ locations, showMine, USER_ID, onSelect
         tooltip.style.fontSize = "11px";
         tooltip.style.whiteSpace = "nowrap";
 
-        // If you want avatar IN the tooltip:
-        if ((loc as any).discord_id && (loc as any).discord_avatar) {
-          const row = document.createElement("div");
-          row.style.display = "flex";
-          row.style.alignItems = "center";
-          row.style.gap = "6px";
+        // ⭐ Username + avatar inside tooltip
+        const row = document.createElement("div");
+        row.style.display = "flex";
+        row.style.alignItems = "center";
+        row.style.gap = "6px";
 
+        if ((loc as any).discord_id && (loc as any).discord_avatar) {
           const img = document.createElement("img");
           img.src = `https://cdn.discordapp.com/avatars/${(loc as any).discord_id}/${(loc as any).discord_avatar}.png`;
           img.style.width = "18px";
           img.style.height = "18px";
           img.style.borderRadius = "50%";
-
-          const nameSpan = document.createElement("span");
-          nameSpan.textContent = (loc as any).discord_username ?? "Unknown";
-
           row.appendChild(img);
-          row.appendChild(nameSpan);
-          tooltip.appendChild(row);
-        } else {
-          // Fallback: just text
-          tooltip.textContent = (loc as any).discord_username ?? "Unknown";
         }
+
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = (loc as any).discord_username ?? "Unknown";
+        row.appendChild(nameSpan);
+
+        tooltip.appendChild(row);
 
         const label = new CSS2DObject(tooltip);
         label.position.set(0, 1.8, 0);
         marker.add(label);
       }
 
-      // ⭐ Avatar sprite ABOVE marker (optional, separate from tooltip)
+      // ⭐ 5. Avatar sprite ABOVE marker (optional)
       if ((loc as any).discord_id && (loc as any).discord_avatar) {
         const avatarUrl = `https://cdn.discordapp.com/avatars/${(loc as any).discord_id}/${(loc as any).discord_avatar}.png`;
         const avatarTexture = textureLoader.load(avatarUrl);
@@ -350,7 +356,7 @@ const Map3D = forwardRef(function Map3D({ locations, showMine, USER_ID, onSelect
         const spriteMaterial = new THREE.SpriteMaterial({ map: avatarTexture });
         const sprite = new THREE.Sprite(spriteMaterial);
         sprite.scale.set(1.5, 1.5, 1.5);
-        sprite.position.set(0, 1.2, 0); // relative to marker
+        sprite.position.set(0, 1.2, 0);
         marker.add(sprite);
       }
     });
