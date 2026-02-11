@@ -265,6 +265,14 @@ const Map3D = forwardRef(function Map3D({ locations, showMine, USER_ID, onSelect
     const scene = sceneRef.current;
     if (!scene) return;
 
+    if (labelRendererRef.current) {
+      while (labelRendererRef.current.domElement.firstChild) {
+        labelRendererRef.current.domElement.removeChild(
+          labelRendererRef.current.domElement.firstChild
+        );
+      }
+    }
+
     const oldGroup = scene.getObjectByName("markers");
     if (oldGroup) scene.remove(oldGroup);
 
