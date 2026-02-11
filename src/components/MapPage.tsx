@@ -234,6 +234,7 @@ export default function MapPage() {
                   if (mapRef.current) {
                     mapRef.current.flyTo(new THREE.Vector3(loc.x, loc.y, loc.z));
                   }
+                  setSelectedLocation(loc);
                 }}
               >
                 {loc.name || "Unnamed"} — X:{loc.x} Z:{loc.z}
