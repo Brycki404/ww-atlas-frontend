@@ -120,6 +120,10 @@ const Map3D = forwardRef(function Map3D({ locations, showMine, USER_ID, onSelect
     mount.appendChild(labelRenderer.domElement);
     labelRendererRef.current = labelRenderer;
 
+    // ⭐ WIPE ANY OLD DOM NODES FROM PREVIOUS RENDERS
+    const dom = labelRenderer.domElement;
+    while (dom.firstChild) dom.removeChild(dom.firstChild);
+
     // --------------------------------------
     // Click handling
     // --------------------------------------
