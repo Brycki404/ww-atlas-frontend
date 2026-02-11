@@ -1,12 +1,14 @@
 // trigger rebuild 7
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Map3D from "./Map3D";
+import * as THREE from "three";
 import CreateLocationModal from "./CreateLocationModal";
 import LocationDetailsPanel from "./LocationDetailsPanel";
 import type { LocationRow } from "../types/my_types";
-import { USER_ID, API_URL } from "../main";
+import { API_URL } from "../main";
 
 export default function MapPage() {
+  const mapRef = useRef<{ flyTo: (v: THREE.Vector3) => void }>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingLocation, setEditingLocation] = useState<LocationRow | null>(null);
 
@@ -220,11 +222,31 @@ export default function MapPage() {
           <option value="newest">Newest Updated</option>
           <option value="oldest">Oldest Updated</option>
         </select>
+
+        <div style={{ padding: "8px", color: "white" }}>
+          <h3>Fly To Marker</h3>
+          <ul>
+            {locations.map(loc => (
+              <li
+                key={loc.id}
+                style={{ cursor: "pointer", textDecoration: "underline" }}
+                onClick={() => {
+                  if (mapRef.current) {
+                    mapRef.current.flyTo(new THREE.Vector3(loc.x, loc.y, loc.z));
+                  }
+                }}
+              >
+                {loc.name || "Unnamed"} — X:{loc.x} Z:{loc.z}
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
 
       {/* 3D Map */}
       <div style={{ flex: 1, position: "relative" }}>
         <Map3D
+          ref={mapRef}
           USER_ID={user_id}
           locations={sorted}
           onSelectLocation={setSelectedLocation}

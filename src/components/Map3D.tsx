@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, forwardRef, useImperativeHandle } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
@@ -19,7 +19,7 @@ interface Map3DProps {
   selectedLocation: LocationRow | null;   // ⭐ ADD THIS
 }
 
-export default function Map3D({ locations, showMine, USER_ID, onSelectLocation }: Map3DProps) {
+const Map3D = forwardRef(function Map3D({ locations, showMine, USER_ID, onSelectLocation, selectedLocation }: Map3DProps, ref) {
   const mountRef = useRef<HTMLDivElement | null>(null);
 
   const sceneRef = useRef<THREE.Scene | null>(null);
@@ -62,6 +62,10 @@ export default function Map3D({ locations, showMine, USER_ID, onSelectLocation }
 
     animateFly();
   };
+
+  useImperativeHandle(ref, () => ({
+    flyTo,
+  }));
 
   // --------------------------------------
   // Setup scene, camera, renderer, controls
@@ -335,4 +339,6 @@ export default function Map3D({ locations, showMine, USER_ID, onSelectLocation }
       style={{ width: "100%", height: "100%", position: "relative", overflow: "hidden" }}
     />
   );
-}
+});
+
+export default Map3D;
