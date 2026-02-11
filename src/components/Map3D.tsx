@@ -134,8 +134,15 @@ const Map3D = forwardRef(function Map3D({ locations, showMine, USER_ID, onSelect
 
       const intersects = raycaster.intersectObjects(markerGroupRef.current.children, true);
       if (intersects.length > 0) {
+        // ⭐ CLEAR ALL OLD CSS2D DOM NODES
+        if (labelRendererRef.current) {
+          const dom = labelRendererRef.current.domElement;
+          while (dom.firstChild) dom.removeChild(dom.firstChild);
+        }
+
         const obj = intersects[0].object as THREE.Mesh;
         const loc = obj.userData as LocationRow;
+        
 
         // Highlight marker
         selectedMarkerRef.current = obj;
@@ -184,6 +191,26 @@ const Map3D = forwardRef(function Map3D({ locations, showMine, USER_ID, onSelect
 
         onSelectLocation(loc);
         flyTo(new THREE.Vector3(loc.x, loc.y, loc.z));
+      } else {
+        // ⭐ CLEAR ALL CSS2D DOM NODES WHEN CLICKING EMPTY SPACE
+        if (labelRendererRef.current) {
+          const dom = labelRendererRef.current.domElement;
+          while (dom.firstChild) dom.removeChild(dom.firstChild);
+        }
+
+        // ⭐ REMOVE PROFILE CARD
+        if (profileCardRef.current && sceneRef.current) {
+          sceneRef.current.remove(profileCardRef.current);
+          profileCardRef.current = null;
+        }
+
+        // ⭐ CLEAR SELECTION
+        selectedMarkerRef.current = null;
+        if (outlinePassRef.current) {
+          outlinePassRef.current.selectedObjects = [];
+        }
+
+        onSelectLocation(null);
       }
     };
 
