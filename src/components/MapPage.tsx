@@ -226,7 +226,7 @@ export default function MapPage() {
         <div style={{ padding: "8px", color: "white" }}>
           <h3>Fly To Marker</h3>
           <ul>
-            {locations.map(loc => (
+            {sorted.map(loc => (
               <li
                 key={loc.id}
                 style={{ cursor: "pointer", textDecoration: "underline" }}

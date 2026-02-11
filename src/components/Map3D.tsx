@@ -304,8 +304,8 @@ const Map3D = forwardRef(function Map3D({ locations, showMine, USER_ID, onSelect
         const spriteMaterial = new THREE.SpriteMaterial({ map: avatarTexture });
         const sprite = new THREE.Sprite(spriteMaterial);
         sprite.scale.set(1.5, 1.5, 1.5);
-        sprite.position.set(loc.x, loc.y + 1.2, loc.z);
-        markerGroup.add(sprite);
+        sprite.position.set(0, 1.2, 0);
+        marker.add(sprite);
 
         // Tooltip using CSS2D
         if (labelRendererRef.current) {
