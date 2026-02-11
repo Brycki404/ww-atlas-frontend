@@ -62,7 +62,7 @@ export default function MapPage() {
         setAvatar(data.discord_avatar);
 
         // 3. Remove ?code=XYZ from the URL
-        window.history.replaceState({}, "", "/ww-atlas-frontend/");
+        window.location.href = "/ww-atlas-frontend/";
       })
       .catch((err) => {
         console.error("CALLBACK ERROR:", err);
