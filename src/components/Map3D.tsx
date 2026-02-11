@@ -272,6 +272,11 @@ const Map3D = forwardRef(function Map3D({ locations, showMine, USER_ID, onSelect
     const scene = sceneRef.current;
     if (!scene) return;
 
+    if (profileCardRef.current && sceneRef.current) {
+      sceneRef.current.remove(profileCardRef.current);
+      profileCardRef.current = null;
+    }
+
     // ⭐ 1. Clear old tooltip DOM nodes BEFORE rebuilding
     if (labelRendererRef.current) {
       const dom = labelRendererRef.current.domElement;
