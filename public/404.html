@@ -4,19 +4,16 @@
     <script>
       const base = "/ww-atlas-frontend";
 
-      let path = window.location.pathname;
-      const query = window.location.search;
+      // Full original URL (path + query + hash)
+      const full = window.location.href;
 
-      // Strip the base prefix ONCE
-      if (path.startsWith(base)) {
-        path = path.slice(base.length);
-      }
-
-      const target = base + path + query;
-
-      // Prevent infinite loops
-      if (window.location.pathname + window.location.search !== target) {
-        window.location.replace(target);
+      // If we're already inside the SPA, do nothing
+      if (window.location.pathname.startsWith(base)) {
+        // Let React Router handle it
+      } else {
+        // Redirect into the SPA, preserving EVERYTHING
+        const newUrl = base + window.location.pathname + window.location.search + window.location.hash;
+        window.location.replace(newUrl);
       }
     </script>
   </head>
