@@ -14,9 +14,6 @@ export default function MapPage() {
   const [showMine, setShowMine] = useState(false);
   const [locations, setLocations] = useState<LocationRow[]>([]);
 
-  const username = localStorage.getItem("discord_username");
-  const avatar = localStorage.getItem("discord_avatar");
-
   // NEW STATE YOU WERE MISSING
   const [search, setSearch] = useState("");
   const [sortMode, setSortMode] = useState<"newest" | "oldest">("newest");
@@ -26,24 +23,6 @@ export default function MapPage() {
     const res = await fetch(`${API_URL}/locations`);
     const data = await res.json();
     setLocations(data);
-  }
-
-  // Delete a location
-  async function handleDelete(id: number) {
-    await fetch(`${API_URL}/locations/${id}`, {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ user_id: USER_ID }),
-    });
-
-    refreshLocations();
-    setSelectedLocation(null);
-  }
-
-  // Open modal in edit mode
-  function handleEdit(location: LocationRow) {
-    setEditingLocation(location);
-    setShowCreateModal(true);
   }
 
   useEffect(() => {
@@ -68,6 +47,7 @@ export default function MapPage() {
 
         // 2. Store user info
         localStorage.setItem("user_id", data.user_id);
+        localStorage.setItem("discord_id", data.discord_id);
         localStorage.setItem("discord_username", data.discord_username);
         localStorage.setItem("discord_avatar", data.discord_avatar);
 
@@ -78,6 +58,29 @@ export default function MapPage() {
         console.error("CALLBACK ERROR:", err);
       });
   }, []);
+
+  const user_id = localStorage.getItem("user_id");
+  const discord_id = localStorage.getItem("discord_id");
+  const username = localStorage.getItem("discord_username");
+  const avatar = localStorage.getItem("discord_avatar");
+
+    // Delete a location
+  async function handleDelete(id: number) {
+    await fetch(`${API_URL}/locations/${id}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ user_id: user_id }),
+    });
+
+    refreshLocations();
+    setSelectedLocation(null);
+  }
+
+  // Open modal in edit mode
+  function handleEdit(location: LocationRow) {
+    setEditingLocation(location);
+    setShowCreateModal(true);
+  }
 
   useEffect(() => {
     refreshLocations();
@@ -100,7 +103,7 @@ export default function MapPage() {
   });
 
   // 3. ShowMine filter happens inside Map3D
-  //    (Map3D already filters based on showMine + USER_ID)
+  //    (Map3D already filters based on showMine + user_id)
 
   return (
     <div style={{ display: "flex", height: "100vh" }}>
@@ -151,7 +154,7 @@ export default function MapPage() {
         {username && (
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             <img
-              src={`https://cdn.discordapp.com/avatars/${USER_ID}/${avatar}.png`}
+              src={`https://cdn.discordapp.com/avatars/${discord_id}/${avatar}.png`}
               style={{ width: 32, height: 32, borderRadius: "50%" }}
             />
             <span>Logged in as {username}</span>
@@ -223,7 +226,7 @@ export default function MapPage() {
       {/* 3D Map */}
       <div style={{ flex: 1, position: "relative" }}>
         <Map3D
-          USER_ID={USER_ID}
+          USER_ID={user_id}
           locations={sorted}
           onSelectLocation={setSelectedLocation}
           selectedLocation={selectedLocation}
