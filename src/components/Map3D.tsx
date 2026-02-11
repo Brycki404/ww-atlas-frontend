@@ -251,9 +251,16 @@ const Map3D = forwardRef(function Map3D({ locations, showMine, USER_ID, onSelect
     return () => {
       renderer.domElement.removeEventListener("click", handleClick);
       window.removeEventListener("resize", handleResize);
-      mount.removeChild(renderer.domElement);
+
+      if (renderer.domElement.parentNode === mount) {
+        mount.removeChild(renderer.domElement);
+      }
+
       if (labelRendererRef.current) {
-        mount.removeChild(labelRendererRef.current.domElement);
+        const dom = labelRendererRef.current.domElement;
+        if (dom.parentNode) {
+          dom.parentNode.removeChild(dom);
+        }
       }
     };
   }, [onSelectLocation]);
@@ -264,14 +271,6 @@ const Map3D = forwardRef(function Map3D({ locations, showMine, USER_ID, onSelect
   useEffect(() => {
     const scene = sceneRef.current;
     if (!scene) return;
-
-    if (labelRendererRef.current) {
-      while (labelRendererRef.current.domElement.firstChild) {
-        labelRendererRef.current.domElement.removeChild(
-          labelRendererRef.current.domElement.firstChild
-        );
-      }
-    }
 
     const oldGroup = scene.getObjectByName("markers");
     if (oldGroup) scene.remove(oldGroup);
@@ -304,7 +303,46 @@ const Map3D = forwardRef(function Map3D({ locations, showMine, USER_ID, onSelect
       marker.userData = loc;
       markerGroup.add(marker);
 
-      // Avatar sprite above marker
+      // ⭐ Tooltip: ALWAYS create this
+      if (labelRendererRef.current) {
+        const tooltip = document.createElement("div");
+        tooltip.style.padding = "4px 8px";
+        tooltip.style.background = "rgba(0,0,0,0.7)";
+        tooltip.style.color = "white";
+        tooltip.style.borderRadius = "6px";
+        tooltip.style.fontSize = "11px";
+        tooltip.style.whiteSpace = "nowrap";
+
+        // If you want avatar IN the tooltip:
+        if ((loc as any).discord_id && (loc as any).discord_avatar) {
+          const row = document.createElement("div");
+          row.style.display = "flex";
+          row.style.alignItems = "center";
+          row.style.gap = "6px";
+
+          const img = document.createElement("img");
+          img.src = `https://cdn.discordapp.com/avatars/${(loc as any).discord_id}/${(loc as any).discord_avatar}.png`;
+          img.style.width = "18px";
+          img.style.height = "18px";
+          img.style.borderRadius = "50%";
+
+          const nameSpan = document.createElement("span");
+          nameSpan.textContent = (loc as any).discord_username ?? "Unknown";
+
+          row.appendChild(img);
+          row.appendChild(nameSpan);
+          tooltip.appendChild(row);
+        } else {
+          // Fallback: just text
+          tooltip.textContent = (loc as any).discord_username ?? "Unknown";
+        }
+
+        const label = new CSS2DObject(tooltip);
+        label.position.set(0, 1.8, 0);
+        marker.add(label);
+      }
+
+      // ⭐ Avatar sprite ABOVE marker (optional, separate from tooltip)
       if ((loc as any).discord_id && (loc as any).discord_avatar) {
         const avatarUrl = `https://cdn.discordapp.com/avatars/${(loc as any).discord_id}/${(loc as any).discord_avatar}.png`;
         const avatarTexture = textureLoader.load(avatarUrl);
@@ -312,31 +350,8 @@ const Map3D = forwardRef(function Map3D({ locations, showMine, USER_ID, onSelect
         const spriteMaterial = new THREE.SpriteMaterial({ map: avatarTexture });
         const sprite = new THREE.Sprite(spriteMaterial);
         sprite.scale.set(1.5, 1.5, 1.5);
-        sprite.position.set(0, 1.2, 0);
+        sprite.position.set(0, 1.2, 0); // relative to marker
         marker.add(sprite);
-
-        // Tooltip using CSS2D
-        if (labelRendererRef.current) {
-          const tooltip = document.createElement("div");
-          tooltip.style.padding = "4px 8px";
-          tooltip.style.background = "rgba(0,0,0,0.7)";
-          tooltip.style.color = "white";
-          tooltip.style.borderRadius = "6px";
-          tooltip.style.fontSize = "11px";
-          tooltip.style.whiteSpace = "nowrap";
-          tooltip.style.opacity = "0";
-          tooltip.style.transition = "opacity 0.15s";
-
-          tooltip.textContent = (loc as any).discord_username ?? "Unknown";
-
-          const label = new CSS2DObject(tooltip);
-          label.position.set(0, 1.8, 0);
-          marker.add(label);
-
-          // Hover via raycaster: we can't attach DOM events to meshes directly,
-          // so we handle hover in the click/raycast loop if you want later.
-          // For now, you can always show tooltip or wire a hover system similarly.
-        }
       }
     });
   }, [locations, showMine, USER_ID]);
