@@ -162,23 +162,12 @@ const Map3D = forwardRef(function Map3D({ locations, showMine, USER_ID, onSelect
         cardDiv.style.flexDirection = "column";
         cardDiv.style.gap = "6px";
         cardDiv.style.minWidth = "160px";
+        cardDiv.style.pointerEvents = "none";
 
         const header = document.createElement("div");
         header.style.display = "flex";
         header.style.alignItems = "center";
         header.style.gap = "8px";
-
-        const avatarImg = document.createElement("img");
-        avatarImg.src = `https://cdn.discordapp.com/avatars/${(loc as any).discord_id}/${(loc as any).discord_avatar}.png`;
-        avatarImg.style.width = "32px";
-        avatarImg.style.height = "32px";
-        avatarImg.style.borderRadius = "50%";
-
-        const nameSpan = document.createElement("span");
-        nameSpan.textContent = (loc as any).discord_username ?? "Unknown";
-
-        header.appendChild(avatarImg);
-        header.appendChild(nameSpan);
 
         const markerName = document.createElement("div");
         markerName.textContent = `Marker: ${loc.name}`;
@@ -326,6 +315,7 @@ const Map3D = forwardRef(function Map3D({ locations, showMine, USER_ID, onSelect
         tooltip.style.borderRadius = "6px";
         tooltip.style.fontSize = "11px";
         tooltip.style.whiteSpace = "nowrap";
+        tooltip.style.pointerEvents = "none";
 
         // ⭐ Username + avatar inside tooltip
         const row = document.createElement("div");
