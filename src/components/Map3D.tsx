@@ -70,19 +70,6 @@ const Map3D = forwardRef(function Map3D({ locations, showMine, USER_ID, onSelect
   function selectMarker(loc: LocationRow) {
     onSelectLocation(loc);
     flyTo(new THREE.Vector3(loc.x, loc.y, loc.z));
-
-    // Highlight marker
-    if (markerGroupRef.current) {
-      const match = markerGroupRef.current.children.find(
-        (child) => child.userData.id === loc.id
-      );
-      if (match instanceof THREE.Mesh) {
-        selectedMarkerRef.current = match;
-        if (outlinePassRef.current) {
-          outlinePassRef.current.selectedObjects = [match];
-        }
-      }
-    }
   }
 
   // --------------------------------------
@@ -333,12 +320,27 @@ const Map3D = forwardRef(function Map3D({ locations, showMine, USER_ID, onSelect
   }, [locations, showMine, USER_ID]);
 
   useEffect(() => {
+    if (!selectedLocation || !markerGroupRef.current) return;
+
+    const match = markerGroupRef.current.children.find(
+      (child): child is THREE.Mesh =>
+        child.userData.id === selectedLocation.id && child instanceof THREE.Mesh
+    );
+
+    if (match) {
+      selectedMarkerRef.current = match;
+      if (outlinePassRef.current) {
+        outlinePassRef.current.selectedObjects = [match];
+      }
+    }
+  }, [selectedLocation, markerGroupRef.current]);
+
+  useEffect(() => {
     if (!selectedLocation && profileCardRef.current && sceneRef.current) {
       sceneRef.current.remove(profileCardRef.current);
       profileCardRef.current = null;
     }
-    selectMarker(selectedLocation!);
-  }, [selectedLocation, onSelectLocation]);
+  }, [selectedLocation]);
 
   return (
     <div
