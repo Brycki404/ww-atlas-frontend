@@ -125,7 +125,7 @@ const Map3D = forwardRef(function Map3D({ locations, showMine, USER_ID, onSelect
     while (dom.firstChild) dom.removeChild(dom.firstChild);
 
     // --------------------------------------
-    // Click handling
+    // Click handling (no profile card)
     // --------------------------------------
     const handleClick = (event: MouseEvent) => {
       if (!rendererRef.current || !cameraRef.current || !markerGroupRef.current) return;
@@ -138,15 +138,8 @@ const Map3D = forwardRef(function Map3D({ locations, showMine, USER_ID, onSelect
 
       const intersects = raycaster.intersectObjects(markerGroupRef.current.children, true);
       if (intersects.length > 0) {
-        // ⭐ CLEAR ALL OLD CSS2D DOM NODES
-        if (labelRendererRef.current) {
-          const dom = labelRendererRef.current.domElement;
-          while (dom.firstChild) dom.removeChild(dom.firstChild);
-        }
-
         const obj = intersects[0].object as THREE.Mesh;
         const loc = obj.userData as LocationRow;
-        
 
         // Highlight marker
         selectedMarkerRef.current = obj;
@@ -154,61 +147,10 @@ const Map3D = forwardRef(function Map3D({ locations, showMine, USER_ID, onSelect
           outlinePassRef.current.selectedObjects = [obj];
         }
 
-        // Create / move 3D profile card near marker
-        if (profileCardRef.current && sceneRef.current) {
-          sceneRef.current.remove(profileCardRef.current);
-          profileCardRef.current = null;
-        }
-
-        const cardGroup = new THREE.Group();
-        cardGroup.position.set(loc.x + 2, loc.y + 2, loc.z);
-
-        const cardDiv = document.createElement("div");
-        cardDiv.style.padding = "10px 14px";
-        cardDiv.style.background = "rgba(0,0,0,0.85)";
-        cardDiv.style.color = "white";
-        cardDiv.style.borderRadius = "8px";
-        cardDiv.style.fontSize = "12px";
-        cardDiv.style.display = "flex";
-        cardDiv.style.flexDirection = "column";
-        cardDiv.style.gap = "6px";
-        cardDiv.style.minWidth = "160px";
-        cardDiv.style.pointerEvents = "none";
-
-        const header = document.createElement("div");
-        header.style.display = "flex";
-        header.style.alignItems = "center";
-        header.style.gap = "8px";
-
-        const markerName = document.createElement("div");
-        markerName.textContent = `Marker: ${loc.name}`;
-        markerName.style.opacity = "0.8";
-
-        cardDiv.appendChild(header);
-        cardDiv.appendChild(markerName);
-
-        const labelObj = new CSS2DObject(cardDiv);
-        cardGroup.add(labelObj);
-
-        scene.add(cardGroup);
-        profileCardRef.current = cardGroup;
-
         onSelectLocation(loc);
         flyTo(new THREE.Vector3(loc.x, loc.y, loc.z));
       } else {
-        // ⭐ CLEAR ALL CSS2D DOM NODES WHEN CLICKING EMPTY SPACE
-        if (labelRendererRef.current) {
-          const dom = labelRendererRef.current.domElement;
-          while (dom.firstChild) dom.removeChild(dom.firstChild);
-        }
-
-        // ⭐ REMOVE PROFILE CARD
-        if (profileCardRef.current && sceneRef.current) {
-          sceneRef.current.remove(profileCardRef.current);
-          profileCardRef.current = null;
-        }
-
-        // ⭐ CLEAR SELECTION
+        // Deselect everything
         selectedMarkerRef.current = null;
         if (outlinePassRef.current) {
           outlinePassRef.current.selectedObjects = [];
@@ -318,8 +260,6 @@ const Map3D = forwardRef(function Map3D({ locations, showMine, USER_ID, onSelect
         ? locations.filter((loc) => loc.user_id === USER_ID)
         : locations;
 
-    const textureLoader = new THREE.TextureLoader();
-
     visibleLocations.forEach((loc) => {
       const isMine = USER_ID && loc.user_id === USER_ID;
 
@@ -348,7 +288,7 @@ const Map3D = forwardRef(function Map3D({ locations, showMine, USER_ID, onSelect
         tooltip.style.whiteSpace = "nowrap";
         tooltip.style.pointerEvents = "none";
 
-        // ⭐ Username + avatar inside tooltip
+        // ⭐ Username + avatar row
         const row = document.createElement("div");
         row.style.display = "flex";
         row.style.alignItems = "center";
@@ -369,21 +309,16 @@ const Map3D = forwardRef(function Map3D({ locations, showMine, USER_ID, onSelect
 
         tooltip.appendChild(row);
 
+        // ⭐ Marker name row
+        const nameRow = document.createElement("div");
+        nameRow.textContent = `Marker: ${loc.name}`;
+        nameRow.style.opacity = "0.8";
+        nameRow.style.marginTop = "4px";
+        tooltip.appendChild(nameRow);
+
         const label = new CSS2DObject(tooltip);
         label.position.set(0, 1.8, 0);
         marker.add(label);
-      }
-
-      // ⭐ 5. Avatar sprite ABOVE marker (optional)
-      if ((loc as any).discord_id && (loc as any).discord_avatar) {
-        const avatarUrl = `https://cdn.discordapp.com/avatars/${(loc as any).discord_id}/${(loc as any).discord_avatar}.png`;
-        const avatarTexture = textureLoader.load(avatarUrl);
-
-        const spriteMaterial = new THREE.SpriteMaterial({ map: avatarTexture });
-        const sprite = new THREE.Sprite(spriteMaterial);
-        sprite.scale.set(1.5, 1.5, 1.5);
-        sprite.position.set(0, 1.2, 0);
-        marker.add(sprite);
       }
     });
   }, [locations, showMine, USER_ID]);
