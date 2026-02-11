@@ -5,6 +5,7 @@ import CreateLocationModal from "./CreateLocationModal";
 import LocationDetailsPanel from "./LocationDetailsPanel";
 import type { LocationRow } from "../types/my_types";
 import { USER_ID, API_URL } from "../main";
+import DiscordCallback from "./DiscordCallback";
 
 export default function MapPage() {
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -45,6 +46,17 @@ export default function MapPage() {
     setEditingLocation(location);
     setShowCreateModal(true);
   }
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get("code");
+
+    if (!code) return;
+
+    DiscordCallback();
+    // Your existing DiscordCallback logic goes here
+    // fetch token, store user, navigate, etc.
+  }, []);
 
   useEffect(() => {
     refreshLocations();
