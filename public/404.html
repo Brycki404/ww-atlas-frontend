@@ -4,16 +4,20 @@
     <script>
       const base = "/ww-atlas-frontend";
 
-      // Capture the full original URL BEFORE GitHub Pages strips anything
-      const full = window.location.href;
+      let path = window.location.pathname;
+      const query = window.location.search;
+      const hash = window.location.hash;
 
-      // If we're already inside the SPA, do nothing
-      if (window.location.pathname.startsWith(base)) {
-        // Let React Router handle it
-      } else {
-        // Redirect into the SPA, preserving EVERYTHING
-        const newUrl = base + window.location.pathname + window.location.search + window.location.hash;
-        window.location.replace(newUrl);
+      // Strip the base prefix ONCE
+      if (path.startsWith(base)) {
+        path = path.slice(base.length);
+      }
+
+      const target = base + path + query + hash;
+
+      // Prevent infinite loops
+      if (window.location.pathname + window.location.search + window.location.hash !== target) {
+        window.location.replace(target);
       }
     </script>
   </head>
