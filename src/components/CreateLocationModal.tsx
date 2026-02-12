@@ -17,18 +17,18 @@ export default function CreateLocationModal({
 }: CreateLocationModalProps) {
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string | null>("");
-  const [x, setX] = useState<number>(0);
-  const [y, setY] = useState<number>(0);
-  const [z, setZ] = useState<number>(0);
+  const [x, setX] = useState<string>("0");
+  const [y, setY] = useState<string>("0");
+  const [z, setZ] = useState<string>("0");
 
   // Pre-fill fields when editing
   useEffect(() => {
     if (initialData) {
       setName(initialData.name);
       setDescription(initialData.description ?? "");
-      setX(initialData.x);
-      setY(initialData.y);
-      setZ(initialData.z);
+      setX(initialData.x != null ? String(initialData.x) : "0");
+      setY(initialData.y != null ? String(initialData.y) : "0");
+      setZ(initialData.z != null ? String(initialData.z) : "0");
     }
   }, [initialData]);
 
@@ -103,24 +103,84 @@ export default function CreateLocationModal({
         <label>X</label>
         <input
           type="number"
+          placeholder="0"
           value={x}
-          onChange={(e) => setX(Number(e.target.value))}
+          onChange={(e) => {
+            const v = e.target.value;
+
+            // Allow empty or "-" while typing
+            if (v === "" || v === "-") {
+              setX(v);
+              return;
+            }
+
+            // Only update if it's a valid number
+            if (!isNaN(Number(v))) {
+              setX(v);
+            }
+          }}
+          onBlur={() => {
+            // Normalize on blur
+            if (x === "" || x === "-") {
+              setX("0");
+            }
+          }}
           style={{ width: "100%", marginBottom: "10px" }}
         />
 
         <label>Y</label>
         <input
           type="number"
+          placeholder="0"
           value={y}
-          onChange={(e) => setY(Number(e.target.value))}
+          onChange={(e) => {
+            const v = e.target.value;
+
+            // Allow empty or "-" while typing
+            if (v === "" || v === "-") {
+              setY(v);
+              return;
+            }
+
+            // Only update if it's a valid number
+            if (!isNaN(Number(v))) {
+              setY(v);
+            }
+          }}
+          onBlur={() => {
+            // Normalize on blur
+            if (y === "" || y === "-") {
+              setY("0");
+            }
+          }}
           style={{ width: "100%", marginBottom: "10px" }}
         />
 
         <label>Z</label>
         <input
           type="number"
+          placeholder="0"
           value={z}
-          onChange={(e) => setZ(Number(e.target.value))}
+          onChange={(e) => {
+            const v = e.target.value;
+
+            // Allow empty or "-" while typing
+            if (v === "" || v === "-") {
+              setZ(v);
+              return;
+            }
+
+            // Only update if it's a valid number
+            if (!isNaN(Number(v))) {
+              setZ(v);
+            }
+          }}
+          onBlur={() => {
+            // Normalize on blur
+            if (z === "" || z === "-") {
+              setZ("0");
+            }
+          }}
           style={{ width: "100%", marginBottom: "10px" }}
         />
 
