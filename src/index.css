@@ -4,6 +4,137 @@ html, body, #root {
   padding: 0;
 }
 
+/* ------------------------------
+   Floating Create/Edit Panel
+------------------------------ */
+.modal {
+  position: absolute;
+  top: 32px;
+  right: 32px;
+  width: 360px;
+  background: rgba(30, 30, 30, 0.85);
+  backdrop-filter: blur(8px);
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  color: white;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modal-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.modal-inner input,
+.modal-inner textarea {
+  width: 100%;
+  padding: 8px;
+  border-radius: 6px;
+  border: none;
+  background: #444;
+  color: white;
+}
+
+.modal-inner button {
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.modal-inner button:last-child {
+  background: #4caf50;
+  color: white;
+}
+
+.modal-inner button:first-child {
+  background: #555;
+  color: white;
+}
+
+/* ------------------------------
+   Right-Side Details Panel
+------------------------------ */
+.details-panel {
+  width: 300px;
+  background: #111;
+  color: white;
+  padding: 20px;
+  border-left: 1px solid #333;
+  overflow-y: auto;
+  transition: width 0.3s ease;
+}
+
+.details-panel button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.details-panel button.close {
+  background: #333;
+  color: white;
+}
+
+.details-panel button.edit {
+  background: #4caf50;
+  color: white;
+}
+
+.details-panel button.delete {
+  background: #d9534f;
+  color: white;
+}
+
+/* ------------------------------
+   Sidebar (Left)
+------------------------------ */
+.sidebar {
+  width: 300px;
+  background: #222;
+  color: white;
+  padding: 20px;
+}
+
+.sidebar button {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background: #444;
+  color: white;
+}
+
+.sidebar input,
+.sidebar select {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 6px;
+  border: none;
+}
+
+/* ------------------------------
+   Animations
+------------------------------ */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .created-by-you {
   background: #4caf50;
   color: white;
